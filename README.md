@@ -45,7 +45,7 @@
         vue-ssr-server-bundle.json    (服务端入口文件)
 ```
 
-### 在`package.json`中添加script
+## 在`package.json`中添加script
 ```
 "build:client": "webpack --config ./src/ssr/webpack.config.client.js"
 "build:server": "webpack --config ./src/ssr/webpack.config.server.js"
