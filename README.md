@@ -1,35 +1,25 @@
-# Lesson 3: 运行 - 在Server端使用`Bundle Renderer`
+# Lesson 3: 与客户端集成
 
-## 生产
->通过使用 webpack 的自定义插件，server bundle 将生成为可传递到 bundle renderer 的特殊 JSON 文件
-## 优点
-> - 内置的 source map 支持（在 webpack 配置中使用 devtool: 'source-map'
-> - 在开发环境甚至部署过程中热重载（通过读取更新后的 bundle，然后重新创建 renderer 实例）
-> - 关键 CSS(critical CSS) 注入（在使用 *.vue 文件时）：自动内联在渲染过程中用到的组件所需的CSS。更多细节请查看 CSS 章节。
-> - 使用 clientManifest 进行资源注入：自动推断出最佳的预加载(preload)和预取(prefetch)指令，以及初始渲染所需的代码分割 chunk。
-## `createBundleRenderer`的使用
+## 问题
+客户端只输出了服务端的内容，打包好的静态资源并没有加载。我们需要告诉服务端需要加载哪些资源
+## `clientManifest`
+> - 在生成的文件名中有哈希时，可以取代 html-webpack-plugin 来注入正确的资源 URL。
+> - 在通过 webpack 的按需代码分割特性渲染 bundle 时，我们可以确保对 chunk 进行最优化的资源预加载/数据预取，并且还可以将所需的异步 chunk 智能地注入为 `<script>` 标签，以避免客户端的瀑布式请求 (waterfall request)，以及改善可交互时间 (TTI - time-to-interactive)。
+
+`webpack.config.client`
 ```
-const { createBundleRenderer } = require('vue-server-renderer')
-const renderer = createBundleRenderer(serverBundle, { /* 选项 */ })
-renderer.renderToString(context)
-```
->`serverBundle` 参数可以是以下之一：
-> - 绝对路径，指向一个已经构建好的 bundle 文件（`.js` 或 `.json`）。必须以 / 开头才会被识别为文件路径。
-> - 由 webpack + vue-server-renderer/server-plugin 生成的 bundle 对象。
-> - JavaScript 代码字符串（不推荐）。
-## 在`package.json`中添加script
-```
-"start":"npm run build & npm run server"
-```
-## 在`webpack.config.base.js`中添加新的别名
-```
-'@components':path.resolve(__dirname,'./components')
+const VueSSRClientPlugin = require('vue-server-renderer/client-plugin')
+
+plugins: [
+  new VueSSRClientPlugin()
+]
 ```
 ## 总结
-到目前为止，我们已经能够把编写的Vue组件输出到客户端中，
-但是在客户端查看源码的时候我们发现打包后的客户端文件并没有加载，
-如果尝试在组件中添加事件，并没有任何作用
+`vue-server-renderer/client-plugin`和`vue-server-renderer/server-plugin`配合使用，
+让服务端知道如何处理Vue编写的组件同时知道了需要向浏览器推送哪些静态资源文件。现在，再次访问页面的时候，页面已经能够正确的响应事件。
+
 ## 注意
-`createBundleRenderer`第一个参数不能是相对路径，否则无法解析。但如果是相对路径，可以使用`reqruir`引入
+需要设置`express`的**静态资源路径**，否则无法访问打包后的静态资源文件。具体设置方法请[参考这里](http://expressjs.com/en/starter/static-files.html)
+需要设置`webpack`的`publicPath`,确保静态资源是相对与`host`加载而非当前的访问路径
 
 

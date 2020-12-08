@@ -4,12 +4,11 @@
   "description": "## 初始化 ``` npm init -y ```",
   "main": "index.js",
   "scripts": {
-    "start":"npm run build & npm run server",
+    "start": "npm run build & npm run server",
     "server": "node ./src/server/server.js",
     "build:client": "webpack --config ./src/ssr/webpack.config.client.js",
     "build:server": "webpack --config ./src/ssr/webpack.config.server.js",
     "build": "npm run build:client & npm run build:server"
-
   },
   "repository": {
     "type": "git",
@@ -28,6 +27,7 @@
     "vue-server-renderer": "^2.6.12"
   },
   "devDependencies": {
+    "clean-webpack-plugin": "^3.0.0",
     "vue-loader": "^15.9.5",
     "vue-template-compiler": "^2.6.12",
     "webpack": "^4.44.2",

@@ -3,8 +3,9 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin')
 console.log(`>>>>${path.resolve(__dirname,'./components')}<<<<`)
 module.exports = {
   output:{
+    publicPath:'/',
     path:path.resolve(__dirname,'../ssr_dist'),
-    filename:'[name].bundle.js'
+    filename:'static/[name].bundle.js'
   },
   module:{
     rules:[
