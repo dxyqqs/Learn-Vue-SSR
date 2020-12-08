@@ -1,9 +1,11 @@
 <template>
   <div id='app'>
-    <h1>{{text}}</h1>
+    <Title :title='text'></Title>
+    <button @click='handleClick'>Click</button>
   </div>
 </template>
 <script>
+import Title from "@components/Title";
 export default {
   name: "App",
   inheritAttrs: false,
@@ -16,7 +18,13 @@ export default {
   computed: {
   },
   methods: {
+    handleClick(){
+      alert(11111)
+    }
   },
-  created () {}
+  created () {},
+  components:{
+    Title
+  }
 }
 </script>

@@ -1,6 +1,6 @@
 const path = require('path')
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
-
+console.log(`>>>>${path.resolve(__dirname,'./components')}<<<<`)
 module.exports = {
   output:{
     path:path.resolve(__dirname,'../ssr_dist'),
@@ -18,7 +18,9 @@ module.exports = {
   },
   resolve:{
     alias:{
-      '@':__dirname
+      '@':__dirname,
+      '@components':path.resolve(__dirname,'./components'),
+
     },
     extensions:['.js','.vue']
   },

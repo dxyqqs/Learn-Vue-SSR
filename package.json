@@ -4,6 +4,7 @@
   "description": "## 初始化 ``` npm init -y ```",
   "main": "index.js",
   "scripts": {
+    "start":"npm run build & npm run server",
     "server": "node ./src/server/server.js",
     "build:client": "webpack --config ./src/ssr/webpack.config.client.js",
     "build:server": "webpack --config ./src/ssr/webpack.config.server.js",

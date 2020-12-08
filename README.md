@@ -1,59 +1,35 @@
-# Lesson 2: 构建打包环境
+# Lesson 3: 运行 - 在Server端使用`Bundle Renderer`
 
-## SSR原理
-- 首屏需要服务端渲染后输出
-- 其他页面需要JS渲染输出
-- 综上所述，后端页面直出，浏览器端会接管当前页，转成SPA
-## SSR约束
-- 服务端的数据是新的，一次性的，确定的，而不应该是响应式数据
-- 服务端可用的组件的生命周期钩子，`beforeCreate` & `created`
-- 通用代码，不能使用特定平台的API
-- 对于自定义指令，如果操作了DOM，就需要进行可用性确认
-- 避免状态单例，为每一个请求创建新的Vue根实列，避免状态的交叉污染
-- 构建，为了实现“原理”中的描述，我们需要使用webpack去处理应用打包，这样可以保证Sever输出的页面、资源和Client的输出保持一致
-
-## SSR构建
-基本的配置是一样的,不一样的地方在于Server和Client两边所使用的入口文件存在差异，这一点毋庸置疑。Server输出页面时，会做很多额外的工作，例如内联相关样式，推断需要preload/prefetch的文件
-使用的工具：
-- webpack@4.44.2
-- webpack-cli
-- webpack-merge
-- webpack-node-externals
-- vue-loader
-- vue-template-compiler
-- vue-server-renderer/server-plugin
-
-## src结构目录
+## 生产
+>通过使用 webpack 的自定义插件，server bundle 将生成为可传递到 bundle renderer 的特殊 JSON 文件
+## 优点
+> - 内置的 source map 支持（在 webpack 配置中使用 devtool: 'source-map'
+> - 在开发环境甚至部署过程中热重载（通过读取更新后的 bundle，然后重新创建 renderer 实例）
+> - 关键 CSS(critical CSS) 注入（在使用 *.vue 文件时）：自动内联在渲染过程中用到的组件所需的CSS。更多细节请查看 CSS 章节。
+> - 使用 clientManifest 进行资源注入：自动推断出最佳的预加载(preload)和预取(prefetch)指令，以及初始渲染所需的代码分割 chunk。
+## `createBundleRenderer`的使用
 ```
-├─server
-│      server.js
-│
-├─ssr
-│  │  App.vue                           
-│  │  clientApp.js                    (客户端打包入口文件)  
-│  │  entry.js
-│  │  serverApp.js                    (服务端打包入口文件) 
-│  │  ssrApp.js
-│  │  template.html
-│  │  webpack.config.base.js          (通用打包配置文件)
-│  │  webpack.config.client.js        (客户端打包配置文件)
-│  │  webpack.config.server.js        (服务端打包配置文件)
-│  │
-│  └─compoents
-└─ssr_dist                            (打包生成文件)
-        client.bundle.js              (客户端入口文件)
-        vue-ssr-server-bundle.json    (服务端入口文件)
+const { createBundleRenderer } = require('vue-server-renderer')
+const renderer = createBundleRenderer(serverBundle, { /* 选项 */ })
+renderer.renderToString(context)
 ```
-
-### 在`package.json`中添加script
+>`serverBundle` 参数可以是以下之一：
+> - 绝对路径，指向一个已经构建好的 bundle 文件（`.js` 或 `.json`）。必须以 / 开头才会被识别为文件路径。
+> - 由 webpack + vue-server-renderer/server-plugin 生成的 bundle 对象。
+> - JavaScript 代码字符串（不推荐）。
+## 在`package.json`中添加script
 ```
-"build:client": "webpack --config ./src/ssr/webpack.config.client.js"
-"build:server": "webpack --config ./src/ssr/webpack.config.server.js"
-"build": "npm run build:client & npm run build:server"
+"start":"npm run build & npm run server"
+```
+## 在`webpack.config.base.js`中添加新的别名
+```
+'@components':path.resolve(__dirname,'./components')
 ```
 ## 总结
-可以看出，服务端和客户端共享了基本打包配置，为直出页面和SPA混合做好准备。
+到目前为止，我们已经能够把编写的Vue组件输出到客户端中，
+但是在客户端查看源码的时候我们发现打包后的客户端文件并没有加载，
+如果尝试在组件中添加事件，并没有任何作用
 ## 注意
-目前对于**Vue2**，`vue-server-renderer/server-plugin`只适配**Webpack4**。如果参照官方SSR文档,那么需要注意在win中对路径以及文件名大小写不敏感，这是容易出问题的地方
+`createBundleRenderer`第一个参数不能是相对路径，否则无法解析。但如果是相对路径，可以使用`reqruir`引入
 
 
