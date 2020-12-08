@@ -1,0 +1,25 @@
+{
+  "name": "Learn-Vue-SSR",
+  "version": "1.0.0",
+  "description": "## 初始化 ``` npm init -y ```",
+  "main": "index.js",
+  "scripts": {
+    "server": "node ./src/server/server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dxyqqs/Learn-Vue-SSR.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dxyqqs/Learn-Vue-SSR/issues"
+  },
+  "homepage": "https://github.com/dxyqqs/Learn-Vue-SSR#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "vue": "^2.6.12",
+    "vue-server-renderer": "^2.6.12"
+  }
+}
