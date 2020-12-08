@@ -4,7 +4,11 @@
   "description": "## 初始化 ``` npm init -y ```",
   "main": "index.js",
   "scripts": {
-    "server": "node ./src/server/server.js"
+    "server": "node ./src/server/server.js",
+    "build:client": "webpack --config ./src/ssr/webpack.config.client.js",
+    "build:server": "webpack --config ./src/ssr/webpack.config.server.js",
+    "build": "npm run build:client & npm run build:server"
+
   },
   "repository": {
     "type": "git",
@@ -21,5 +25,13 @@
     "express": "^4.17.1",
     "vue": "^2.6.12",
     "vue-server-renderer": "^2.6.12"
+  },
+  "devDependencies": {
+    "vue-loader": "^15.9.5",
+    "vue-template-compiler": "^2.6.12",
+    "webpack": "^4.44.2",
+    "webpack-cli": "^4.2.0",
+    "webpack-merge": "^5.4.0",
+    "webpack-node-externals": "^2.5.2"
   }
 }
