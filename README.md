@@ -1,25 +1,46 @@
-# Lesson 4: 与客户端集成
+# Lesson 5: 处理Vue中的CSS
 
-## 问题
-客户端只输出了服务端的内容，打包好的静态资源并没有加载。我们需要告诉服务端需要加载哪些资源
-## `clientManifest`
-> - 在生成的文件名中有哈希时，可以取代 html-webpack-plugin 来注入正确的资源 URL。
-> - 在通过 webpack 的按需代码分割特性渲染 bundle 时，我们可以确保对 chunk 进行最优化的资源预加载/数据预取，并且还可以将所需的异步 chunk 智能地注入为 `<script>` 标签，以避免客户端的瀑布式请求 (waterfall request)，以及改善可交互时间 (TTI - time-to-interactive)。
+## 前言
+到目前为止，我们已经做了很多复杂的事请，但还有很多简单的事请的没做，比如CSS。但记住，虽然说的是CSS，
+其实是为了说明出现问题，如何解决它。  
+让我们在`Vue.app`中加入样式,并启动服务
+```css
+<style>
+  #app{
+    border:1px solid #f00
+  }
 
-`webpack.config.client`
+</style>
 ```
-const VueSSRClientPlugin = require('vue-server-renderer/client-plugin')
-
-plugins: [
-  new VueSSRClientPlugin()
-]
+**然而样式并没有按照预期展示出来。**
+## 解决问题
+- 按照官方文档，样式应当会自动注入模板文件，但是也可以手动注入，尝试一下
+- 尝试以后发现方法`context.renderStyles()`返回压根是空的，可以推断，`renderStyles`出现了问题
+- `renderStyles`属于Node环境代码，那我们就需要一种手段能够对node代码进行调试，我们在命令行加入以下代码，
+就能够在chrome中开始断点了
 ```
+"server": "node --inspect ./src/server/server.js"
+```
+- 进行断点后发现`renderStyles`来源于`server bundle`,但`server bundle`经过压缩完全不能阅读
+- 请在`webpack.config.server.js`中加上以下代码
+```javascript
+mode:'development'
+```
+- 再次断点，发现以下问题,list应当是一个数组，但是实际传递的是一个对象
+```
+function addStyleDev (styles, list) {
+...
+}
+```
+- 最终发现list数据来源于`css-loader`,问题是`css-loader`转换的CSS对象使用了ES6 module的默认导出也就是`{default}`
+- 最终推出`css-loader`的导出模式出现问题，因为版本和官方示例不同，所以基本就是版本问题。然后去`vue-style-loader`的issue
+上查找一下，发现了[如下问题](https://github.com/vuejs/vue-style-loader/issues/46)
+
 ## 总结
-`vue-server-renderer/client-plugin`和`vue-server-renderer/server-plugin`配合使用，
-让服务端知道如何处理Vue编写的组件同时知道了需要向浏览器推送哪些静态资源文件。现在，再次访问页面的时候，页面已经能够正确的响应事件。
+出现问题时，要学会寻找解决问题的步骤
 
 ## 注意
-需要设置`express`的**静态资源路径**，否则无法访问打包后的静态资源文件。具体设置方法请[参考这里](http://expressjs.com/en/starter/static-files.html)
-需要设置`webpack`的`publicPath`,确保静态资源是相对与`host`加载而非当前的访问路径
+这个问题花了3天时间才最终解决，凡事不要放弃。
+
 
 

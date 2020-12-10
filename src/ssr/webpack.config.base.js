@@ -1,6 +1,5 @@
 const path = require('path')
 const VueLoaderPlugin = require('vue-loader/lib/plugin')
-console.log(`>>>>${path.resolve(__dirname,'./components')}<<<<`)
 module.exports = {
   output:{
     publicPath:'/',
@@ -13,6 +12,18 @@ module.exports = {
         test: /\.vue$/,
         use:[
           'vue-loader'
+        ]
+      },
+      {
+        test: /\.css$/,
+        use:[
+          'vue-style-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              esModule:false
+            }
+          }
         ]
       }
     ]

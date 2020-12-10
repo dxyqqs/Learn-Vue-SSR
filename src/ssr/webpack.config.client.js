@@ -10,8 +10,6 @@ module.exports = merge(webpackBaseConfig,{
   },
   plugins:[
     new CleanWebpackPlugin(),
-    new VueSSRClientPlugin({
-      filename:'vue-ssr-client-manifest.json'
-    })
+    new VueSSRClientPlugin()
   ]
 })

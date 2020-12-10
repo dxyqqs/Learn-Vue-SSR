@@ -1,7 +1,7 @@
 <template>
   <div id='app'>
     <Title :title='text'></Title>
-    <button @click='handleClick'>Click</button>
+    <button @click='handleClick' class='button'>Click</button>
   </div>
 </template>
 <script>
@@ -28,3 +28,9 @@ export default {
   }
 }
 </script>
+<style>
+  #app{
+    border:2px solid #f00
+  }
+
+</style>
